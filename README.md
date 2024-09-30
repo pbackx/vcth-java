@@ -9,6 +9,9 @@ Currently there is no much here yet. I wanted to test out some new things or ref
 - Spring Data JDBC
 - Spring Batch (maybe)
 - DuckDB ❌
+- Cursor IDE
+
+## DuckDB
 
 I tried to integrate DuckDB, but for some reason it did not want to cooperate with Spring Data JDBC. For the record, this is what I tried:
 
@@ -17,6 +20,17 @@ I tried to integrate DuckDB, but for some reason it did not want to cooperate wi
 
 Anyway, you may be wondering why I didn't import the JSON directly into DuckDB. I tried that, but the resulting structure is so clunky, I
 think the resulting SQL would be an unreadable and unmaintainable nightmare.
+
+## Cursor IDE
+
+My regular IDE is IntelliJ IDEA, and I've been using it for a long time for pretty much any programming language or framework.
+
+I totally get what Cursor is trying to do and I like it. With Github Copilot in IntelliJ IDEA, you can get very close to the same experience,
+but not completely. AI is just better integrated into Cursor.
+
+Cursor is definitely missing some things that I like about IntelliJ IDEA. Most importantly, configuring Cursor is a nightmare. For instance,
+I was unable to increase some of the font sizes and colors. There is libaral use of small gray on black text that my eyes are having a 
+really hard time with.
 
 # Goal
 
