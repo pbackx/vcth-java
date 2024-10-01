@@ -12,7 +12,7 @@ public class Database {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public String getCurrentDuckDbDate() throws SQLException {
+    public String getCurrentDateString() throws SQLException {
         return jdbcTemplate.queryForObject("SELECT CURRENT_TIMESTAMP", String.class);
     }
 }

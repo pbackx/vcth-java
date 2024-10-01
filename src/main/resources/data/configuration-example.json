@@ -1,0 +1,285 @@
+{
+    "platformGameId": "val:00676ae0-0a4d-4577-be1e-ab4d3a9889aa",
+    "configuration": {
+        "teams": [
+            {
+                "teamId": {
+                    "value": 19
+                },
+                "playersInTeam": [
+                    {
+                        "value": 6
+                    },
+                    {
+                        "value": 7
+                    },
+                    {
+                        "value": 8
+                    },
+                    {
+                        "value": 9
+                    },
+                    {
+                        "value": 10
+                    }
+                ],
+                "name": "Red"
+            },
+            {
+                "teamId": {
+                    "value": 20
+                },
+                "playersInTeam": [
+                    {
+                        "value": 1
+                    },
+                    {
+                        "value": 2
+                    },
+                    {
+                        "value": 3
+                    },
+                    {
+                        "value": 4
+                    },
+                    {
+                        "value": 5
+                    }
+                ],
+                "name": "Blue"
+            }
+        ],
+        "selectedMap": {
+            "id": "UNKNOWN",
+            "fallback": {
+                "guid": "/Game/Maps/Foxtrot/Foxtrot",
+                "displayName": "Foxtrot"
+            }
+        },
+        "players": [
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "89807323-0b15-5558-8f02-1591652a6475"
+                },
+                "playerId": {
+                    "value": 1
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "601DBBE7-43CE-BE57-2A40-4ABD24953621",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FNC Chronicle",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "50b9182b-a40f-5173-9aa2-2555a908a222"
+                },
+                "playerId": {
+                    "value": 2
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "7F94D92C-4234-0A36-9646-3A87EB8B5C89",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FNC Derke",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "ba1854ee-357e-5830-a2ce-df243816fb00"
+                },
+                "playerId": {
+                    "value": 3
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "707EAB51-4836-F488-046A-CDA6BF494859",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FNC Boaster",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "fe8b120c-b857-5639-9e57-346a435262d4"
+                },
+                "playerId": {
+                    "value": 4
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "320B2A48-4D9B-A075-30F1-1F93A9B638FA",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FNC Leo ",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "5e887d43-b5e5-5922-9c67-edbea577e42c"
+                },
+                "playerId": {
+                    "value": 5
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "117ED9E3-49F3-6512-3CCF-0CADA7E3823B",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FNC Alfajer",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "e109e8fb-d41d-52de-b12a-c799edbaf2c6"
+                },
+                "playerId": {
+                    "value": 6
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "601DBBE7-43CE-BE57-2A40-4ABD24953621",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FUT qRaxs",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "711cf08d-0eec-53b5-9212-6b31b2f02c19"
+                },
+                "playerId": {
+                    "value": 7
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "117ED9E3-49F3-6512-3CCF-0CADA7E3823B",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FUT yetujey",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "4e6a0822-75ba-5909-a90b-e4611fe4072e"
+                },
+                "playerId": {
+                    "value": 8
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "320B2A48-4D9B-A075-30F1-1F93A9B638FA",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FUT MrFaliN",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "53396356-d497-5801-90e5-3223a4adc8b0"
+                },
+                "playerId": {
+                    "value": 9
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "ADD6443A-41BD-E414-F6AD-E58D267F4E95",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FUT cNed",
+                "tagLine": "eProd"
+            },
+            {
+                "accountId": {
+                    "type": "RIOT_ID",
+                    "value": "0a2230d0-8418-59f0-ad02-074213527222"
+                },
+                "playerId": {
+                    "value": 10
+                },
+                "selectedAgent": {
+                    "type": "UNKNOWN",
+                    "fallback": {
+                        "guid": "707EAB51-4836-F488-046A-CDA6BF494859",
+                        "displayName": ""
+                    }
+                },
+                "type": "HUMAN",
+                "displayName": "FUT ATA KAPTAN",
+                "tagLine": "eProd"
+            }
+        ],
+        "spikeMode": {
+            "currentRound": 1,
+            "attackingTeam": {
+                "value": 19
+            },
+            "completedRounds": [],
+            "roundsToWin": 13,
+            "defendingTeam": {
+                "value": 20
+            }
+        }
+    },
+    "metadata": {
+        "serverInfo": {
+            "processId": "",
+            "rfc190Scope": "aresriot.aws-usw2-prod.tournament-gp-offline-16.ares.gameserver"
+        },
+        "playback": 0,
+        "sequenceNumber": 1,
+        "stage": 1,
+        "gameVersion": "08.07.00.2460481",
+        "gameId": {
+            "value": "00676ae0-0a4d-4577-be1e-ab4d3a9889aa"
+        },
+        "eventTime": {
+            "includedPauses": "0.059s",
+            "omittingPauses": "0.059s"
+        },
+        "wallTime": "2024-05-11T17:00:52.541Z",
+        "currentGamePhase": {
+            "phase": "NOT_STARTED",
+            "roundNumber": 0
+        }
+    }
+}

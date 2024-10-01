@@ -10,6 +10,8 @@ Currently there is no much here yet. I wanted to test out some new things or ref
 - Spring Batch (maybe)
 - DuckDB ❌
 - Cursor IDE
+- Thymeleaf
+- HTMX
 
 ## DuckDB
 
