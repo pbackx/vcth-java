@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Column;
 
 public record Game(
     @Id Integer id, 
-    String externalId, 
+    String platformGameId, 
     @Column("WINNING_TEAM_ID") Integer winningTeamId, 
     @Column("LOSING_TEAM_ID") Integer losingTeamId) {
 

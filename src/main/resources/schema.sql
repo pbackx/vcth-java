@@ -1,12 +1,13 @@
 CREATE TABLE IF NOT EXISTS team (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    mapping_data_id VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS player (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    external_id VARCHAR(255) UNIQUE NOT NULL
+    mapping_data_id VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS player_team (
@@ -19,7 +20,7 @@ CREATE TABLE IF NOT EXISTS player_team (
 
 CREATE TABLE IF NOT EXISTS game (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    external_id VARCHAR(255) UNIQUE NOT NULL,
+    platform_game_id VARCHAR(255) UNIQUE NOT NULL,
     winning_team_id INT,
     losing_team_id INT,
     FOREIGN KEY (winning_team_id) REFERENCES team(id),

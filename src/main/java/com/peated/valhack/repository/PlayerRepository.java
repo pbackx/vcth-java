@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 
 public interface PlayerRepository extends ListCrudRepository<Player, Integer> {
-    Optional<Player> findByExternalId(String externalId);
+    Optional<Player> findByMappingDataId(String externalId);
 
-    boolean existsByExternalId(String externalId);
+    boolean existsByMappingDataId(String externalId);
 }
