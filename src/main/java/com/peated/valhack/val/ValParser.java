@@ -16,11 +16,17 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.peated.valhack.model.Agent;
+import com.peated.valhack.model.Game;
 import com.peated.valhack.model.Player;
 import com.peated.valhack.model.PlayerRef;
+import com.peated.valhack.model.SelectedAgent;
 import com.peated.valhack.model.Team;
+import com.peated.valhack.repository.AgentRepository;
+import com.peated.valhack.repository.GameRepository;
 import com.peated.valhack.repository.MappingDataRepository;
 import com.peated.valhack.repository.PlayerRepository;
+import com.peated.valhack.repository.SelectedAgentRepository;
 import com.peated.valhack.repository.TeamRepository;
 
 @Component
@@ -32,7 +38,19 @@ public class ValParser {
     private TeamRepository teamRepository;
 
     @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
+    private AgentRepository agentRepository;
+
+    @Autowired
+    private SelectedAgentRepository selectedAgentRepository;
+
+    @Autowired
     private MappingDataRepository mappingDataRepository;
+
+    @Autowired
+    private AgentToRoleMapper agentToRoleMapper;
 
     public ValParser() {
     }
@@ -77,11 +95,21 @@ public class ValParser {
 
             var players = new HashMap<Integer, Player>();
             var teams = new HashMap<Integer, Team>();
+            var agentsForPlayer = new HashMap<Integer, Agent>();
 
             for (JsonNode player : configurationNode.get("players")) {
                 var localPlayerId = player.get("playerId").get("value").asInt();
                 var playerMappingDataId = getPlayerMappingDataId(platformGameId, localPlayerId);
                 players.put(localPlayerId, this.createOrUpdatePlayer(player, playerMappingDataId));
+
+                var selectedAgent = player.get("selectedAgent");
+                if (selectedAgent.get("type").asText().equals("UNKNOWN")) {
+                    var fallback = selectedAgent.get("fallback");
+                    agentsForPlayer.put(localPlayerId, createOrUpdateAgent(fallback));
+                } else {
+                    System.out.println("Unknown selected agent type: " + selectedAgent);
+                    result.append("Unknown selected agent type: " + selectedAgent + "\n");
+                }
             }
 
             result.append("\nPlayers:\n");
@@ -96,12 +124,51 @@ public class ValParser {
                 teams.put(localTeamId, this.createOrUpdateTeam(team, teamMappingDataId, players));
             }
 
+            result.append("\nAgents:\n");
+            for (Map.Entry<Integer, Agent> entry : agentsForPlayer.entrySet()) {
+                result.append(entry.getValue())
+                      .append("\n");
+            }
+
             result.append("\nTeams:\n");
             for (Map.Entry<Integer, Team> entry : teams.entrySet()) {
                 result.append(entry.getValue())
                       .append("\n");
             }
 
+            if (!gameDecidedNode.get("state").asText().equals("WINNER_DECIDED")) {
+                System.out.println("Unexpected gameDecided state: " + gameDecidedNode);
+                result.append("Unexpected gameDecided state. Check server logs for details.\n");
+                result.append("GameDecided JSON:\n");
+                result.append(gameDecidedNode.toPrettyString());
+                return result.toString();
+            }
+
+            var localWinningTeamId = gameDecidedNode.get("winningTeam").get("value").asInt();
+            var localLosingTeamId = teams.keySet().stream()
+                .filter(id -> id != localWinningTeamId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not determine losing team"));
+
+            var winningTeamId = teams.get(localWinningTeamId).id();
+            var losingTeamId = teams.get(localLosingTeamId).id();
+
+            var game = createOrUpdateGame(platformGameId, winningTeamId, losingTeamId);
+
+            for (Map.Entry<Integer, Agent> entry : agentsForPlayer.entrySet()) {
+                var playerId = entry.getKey();
+                var agent = entry.getValue();
+                var selectedAgent = new SelectedAgent(
+                    game.id(), playerId, agent.id()
+                );
+                selectedAgentRepository.saveOrUpdate(selectedAgent);
+            }
+
+            result.append("\nSelected Agents:\n");
+            for (SelectedAgent selectedAgent : selectedAgentRepository.findAll()) {
+                result.append(selectedAgent)
+                      .append("\n");
+            }
         }
 
         return result.toString();
@@ -125,7 +192,7 @@ public class ValParser {
             existingPlayer = new Player(existingPlayer.id(), playerObj.name(), existingPlayer.mappingDataId());
             return playerRepository.save(existingPlayer);
         } else {
-        return playerRepository.save(playerObj);
+            return playerRepository.save(playerObj);
         }
     }
 
@@ -143,8 +210,37 @@ public class ValParser {
             playersInTeam
         );
 
-        return teamRepository.save(teamObj);
+        if (teamRepository.existsByMappingDataId(teamObj.mappingDataId())) {
+            Team existingTeam = teamRepository.findByMappingDataId(teamObj.mappingDataId()).get();
+            existingTeam = new Team(existingTeam.id(), teamObj.name(), existingTeam.mappingDataId(), teamObj.players());
+            return teamRepository.save(existingTeam);
+        } else {
+            return teamRepository.save(teamObj);
+        }
     }
 
+    private Game createOrUpdateGame(String platformGameId, int winningTeamId, int losingTeamId) {
+        var game = new Game(null, platformGameId, winningTeamId, losingTeamId);
+        if (gameRepository.existsByPlatformGameId(platformGameId)) {
+            Game existingGame = gameRepository.findByPlatformGameId(platformGameId).get();
+            return gameRepository.save(new Game(existingGame.id(), platformGameId, winningTeamId, losingTeamId));
+        } else {
+            return gameRepository.save(game);
+        }
+    }
 
+    private Agent createOrUpdateAgent(JsonNode fallback) {
+        var agentGuid = fallback.get("guid").asText();
+        var agent = new Agent(
+            null, 
+            agentGuid, 
+            agentToRoleMapper.getRole(agentGuid)
+        );
+
+        if (agentRepository.existsByGuid(agent.guid())) {
+            return agentRepository.findByGuid(agent.guid()).get();
+        } else {
+            return agentRepository.save(agent);
+        }
+    }
 }
