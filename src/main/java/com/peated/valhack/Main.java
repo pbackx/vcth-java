@@ -1,28 +1,23 @@
 package com.peated.valhack;
 
-import java.io.IOException;
-import java.util.stream.Collectors;
-
 import com.peated.valhack.service.GameDataProvider;
 import com.peated.valhack.service.GameService;
+import com.peated.valhack.val.ValParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import com.peated.valhack.val.ValParser;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Controller
 @SpringBootApplication
+@EnableAsync
 public class Main implements CommandLineRunner {
 
     @Autowired
@@ -46,22 +41,13 @@ public class Main implements CommandLineRunner {
 
     @GetMapping("/")
     public String index(Model model) {
-        var dataFiles = gameDataProvider.getDataFiles();
-        var dataFileStatuses = dataFiles.stream()
-                .collect(Collectors.toMap(
-                        file -> file,
-                        file -> gameService.getStatus(file)
-                ));
-
-        model.addAttribute("dataFileStatuses", dataFileStatuses);
+        model.addAttribute("dataFiles", gameService.getGameFiles());
         return "index";
     }
 
     @PostMapping("/process")
     public String processData(@RequestBody IndexDataFileRequest request, Model model) throws IOException {
         Resource resource = gameDataProvider.getDataFile(request.getDataFileId());
-
-        System.out.println("Processing data file: " + resource.getFile().getAbsolutePath());
 
         var result = this.valParser.parse(resource);
 

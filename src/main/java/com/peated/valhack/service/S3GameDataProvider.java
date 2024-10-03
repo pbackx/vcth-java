@@ -1,21 +1,19 @@
 package com.peated.valhack.service;
 
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @Component
 public class S3GameDataProvider implements GameDataProvider {
     private final S3Client s3Client;
 
-    private static final String LEAGUE = "vct-international";
+//    private static final String LEAGUE = "vct-international";
 
     public S3GameDataProvider(S3Client s3Client) {
         this.s3Client = s3Client;
@@ -51,12 +49,10 @@ public class S3GameDataProvider implements GameDataProvider {
                             .key("vct-international/games/2024/" + id)
             );
 
-            File tempFile = File.createTempFile("s3file-", ".tmp");
-            try (var inputStream = response) {
-                Files.copy(inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            try (var inputStream = response; var outputStream = new ByteArrayOutputStream()) {
+                inputStream.transferTo(outputStream);
+                return new ByteArrayResource(outputStream.toByteArray());
             }
-
-            return new FileSystemResource(tempFile);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

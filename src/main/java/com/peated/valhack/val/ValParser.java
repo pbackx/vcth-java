@@ -1,6 +1,5 @@
 package com.peated.valhack.val;
 
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,8 +55,7 @@ public class ValParser {
 
     public String parse(Resource resource) throws IOException {
         var result = new StringBuilder();
-        try (FileInputStream fileInputStream = new FileInputStream(resource.getFile());
-             var gzipInputStream = new GZIPInputStream(fileInputStream);
+        try (var gzipInputStream = new GZIPInputStream(resource.getInputStream());
              var reader = new InputStreamReader(gzipInputStream);
              var bufferedReader = new BufferedReader(reader)) {
             

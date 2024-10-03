@@ -17,7 +17,18 @@
             <h1>Valhack</h1>
         </header>
         <main>
-            <p class="lead">Game data currently available locally:</p>
+
+            <div class="mt-4">
+                <p>Automatic processing of unprocessed files:</p>
+                <button class="btn btn-success" hx-post="/process/start" hx-swap="none">Start</button>
+                <button class="btn btn-danger" hx-post="/process/stop" hx-swap="none">Stop</button>
+                <p>
+                    Current status:
+                    <span hx-get="/process/status" hx-trigger="load, every 5s" hx-swap="innerHTML"></span>
+                </p>
+            </div>
+
+            <p class="lead">Game data currently available:</p>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -27,12 +38,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="element : ${dataFileStatuses}">
-                        <td th:text="${element.key}"></td>
+                    <tr th:each="element : ${dataFiles}">
+                        <td th:text="${element.fileName()}"></td>
                         <td>
-                            <span th:if="${element.value.name() == 'TO_PROCESS'}" class="badge bg-warning">To Process</span>
-                            <span th:if="${element.value.name() == 'DONE'}" class="badge bg-success">Done</span>
-                            <span th:if="${element.value.name() == 'ERROR'}" class="badge bg-danger">Error</span>
+                            <span th:if="${element.status().name() == 'TO_PROCESS'}" class="badge bg-warning">To Process</span>
+                            <span th:if="${element.status().name() == 'DONE'}" class="badge bg-success">Done</span>
+                            <span th:if="${element.status().name() == 'ERROR'}" class="badge bg-danger">Error</span>
                         </td>
                         <td>
                             <form 
@@ -42,7 +53,7 @@
                                 hx-swap="innerHTML"
                                 hx-ext="json-enc"
                             >
-                                <input type="hidden" name="dataFileId" th:value="${element.key}" />
+                                <input type="hidden" name="dataFileId" th:value="${element.fileName()}" />
                                 <button 
                                     class="btn btn-primary btn-sm"
                                 >

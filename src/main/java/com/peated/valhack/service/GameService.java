@@ -1,19 +1,25 @@
 package com.peated.valhack.service;
 
+import com.peated.valhack.model.DataFile;
 import com.peated.valhack.model.DataFileStatus;
 import com.peated.valhack.repository.GameRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GameService {
-    @Autowired
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
+    private final GameDataProvider gameDataProvider;
+
+    public GameService(GameRepository gameRepository, GameDataProvider gameDataProvider) {
+        this.gameRepository = gameRepository;
+        this.gameDataProvider = gameDataProvider;
+    }
 
     /**
-     *
      * @param gameFileName the name of the game file, for instance "val_00676ae0-0a4d-4577-be1e-ab4d3a9889aa.json.gz"
-     * @return whether or not the file was already processed
+     * @return whether the file was already processed
      */
     public DataFileStatus getStatus(String gameFileName) {
         try {
@@ -26,5 +32,12 @@ public class GameService {
         } catch (Exception e) {
             return DataFileStatus.ERROR;
         }
+    }
+
+    public List<DataFile> getGameFiles() {
+        var dataFiles = gameDataProvider.getDataFiles();
+        return dataFiles.stream()
+                .map(dataFile -> new DataFile(dataFile, this.getStatus(dataFile)))
+                .toList();
     }
 }
