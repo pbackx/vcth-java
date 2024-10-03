@@ -26,11 +26,11 @@ public class SelectedAgentRepository {
         }
     }
 
-    public List<SelectedAgent> findAll() {
-        return jdbcTemplate.query("SELECT * FROM selected_agent", (rs, rowNum) -> new SelectedAgent(
+    public List<SelectedAgent> findByGameId(int gameId) {
+        return jdbcTemplate.query("SELECT * FROM selected_agent WHERE game_id = ?", (rs, rowNum) -> new SelectedAgent(
             rs.getInt("game_id"),
             rs.getInt("player_id"),
             rs.getInt("agent_id")
-        ));
+        ), gameId);
     }
 }

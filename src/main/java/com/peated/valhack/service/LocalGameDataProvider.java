@@ -1,4 +1,4 @@
-package com.peated.valhack;
+package com.peated.valhack.service;
 
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
 
-@Component
-public class GameDataProvider implements ResourceLoaderAware{
+/**
+ * Can be used for testing purposes.
+ */
+public class LocalGameDataProvider implements ResourceLoaderAware, GameDataProvider {
 
     private ResourceLoader resourceLoader;
     private List<String> dataFiles;
@@ -36,10 +38,12 @@ public class GameDataProvider implements ResourceLoaderAware{
         }
     }
 
+    @Override
     public List<String> getDataFiles() {
         return dataFiles;
     }
 
+    @Override
     public Resource getDataFile(String id) {
         String matchingFile = dataFiles.stream()
                 .filter(file -> file.contains(id))

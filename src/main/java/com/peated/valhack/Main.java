@@ -1,6 +1,10 @@
 package com.peated.valhack;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
+
+import com.peated.valhack.service.GameDataProvider;
+import com.peated.valhack.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,6 +31,9 @@ public class Main implements CommandLineRunner {
     @Autowired
     private ValParser valParser;
 
+    @Autowired
+    private GameService gameService;
+
     @Override
     public void run(String... args) throws Exception {
     }
@@ -39,7 +46,14 @@ public class Main implements CommandLineRunner {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("dataFiles", gameDataProvider.getDataFiles());
+        var dataFiles = gameDataProvider.getDataFiles();
+        var dataFileStatuses = dataFiles.stream()
+                .collect(Collectors.toMap(
+                        file -> file,
+                        file -> gameService.getStatus(file)
+                ));
+
+        model.addAttribute("dataFileStatuses", dataFileStatuses);
         return "index";
     }
 

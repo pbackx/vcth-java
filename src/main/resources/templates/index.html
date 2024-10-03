@@ -27,10 +27,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="dataFile : ${dataFiles}">
-                        <td th:text="${dataFile}"></td>
+                    <tr th:each="element : ${dataFileStatuses}">
+                        <td th:text="${element.key}"></td>
                         <td>
-                            <span class="badge bg-warning">To Process</span>
+                            <span th:if="${element.value.name() == 'TO_PROCESS'}" class="badge bg-warning">To Process</span>
+                            <span th:if="${element.value.name() == 'DONE'}" class="badge bg-success">Done</span>
+                            <span th:if="${element.value.name() == 'ERROR'}" class="badge bg-danger">Error</span>
                         </td>
                         <td>
                             <form 
@@ -40,7 +42,7 @@
                                 hx-swap="innerHTML"
                                 hx-ext="json-enc"
                             >
-                                <input type="hidden" name="dataFileId" th:value="${dataFile}" />
+                                <input type="hidden" name="dataFileId" th:value="${element.key}" />
                                 <button 
                                     class="btn btn-primary btn-sm"
                                 >
