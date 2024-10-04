@@ -9,7 +9,7 @@ Currently there is no much here yet. I wanted to test out some new things or ref
 - Spring Data JDBC
 - Spring Batch (maybe)
 - DuckDB ❌
-- Cursor IDE
+- Cursor IDE ❌
 - Thymeleaf
 - HTMX
 
@@ -31,8 +31,18 @@ I totally get what Cursor is trying to do and I like it. With Github Copilot in 
 but not completely. AI is just better integrated into Cursor.
 
 Cursor is definitely missing some things that I like about IntelliJ IDEA. Most importantly, configuring Cursor is a nightmare. For instance,
-I was unable to increase some of the font sizes and colors. There is libaral use of small gray on black text that my eyes are having a 
+I was unable to increase some of the font sizes and colors. There is liberal use of small gray on black text that my eyes are having a 
 really hard time with.
+
+Update: After a week of consistently using Cursor, I gave up and returned to IntelliJ IDEA. There were just so many small
+things. For instance, it didn't automatically import classes when it could, it tried to intend in very weird ways, and it
+had autocomplete suggestions that would simply not compile (the basics, such as trying to use a method that doesn't exist).
+
+## HTMX
+
+I had heard about HTMX through various people and articles. I understand the attraction. Not having to write JavaScript is a big plus.
+However, this comes with limitations and it looks like it may force you into crafting complex code just to get around those limitations.
+
 
 # Goal
 
@@ -40,3 +50,29 @@ Just to get me going, I decided on this first use case:
 
 Extract a list of all matches played and the composition of the teams (the roles).
 This is going to be the input for a chatbot that will decide the best team composition.
+
+# Notes
+
+## Running on EC2
+
+With regard to permissions, it is easiest to give your EC2 instance a role that has read access to S3.
+
+Adoptium / Temuring on Amazon Linux is a manual process:
+
+    wget https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4%2B7/OpenJDK21U-jdk_x64_linux_hotspot_21.0.4_7.tar.gz
+    tar xzf OpenJDK21U-jdk_x64_linux_hotspot_21.0.4_7.tar.gz
+    sudo mv jdk-21.0.4+7/ /opt/jdk-21
+
+Install Gradle:
+
+    wget https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+    sudo mkdir /opt/gradle
+    sudo unzip -d /opt/gradle gradle-8.10.2-bin.zip
+
+Add the following to your `.bashrc`:
+
+    export JAVA_HOME=/opt/jdk-21
+    export PATH=$JAVA_HOME/bin:/opt/gradle/gradle-8.10.2/bin:$PATH
+
+You may want to update the Java alternatives, but I did not bother for now.
+[Here are more instructions](https://techviewleo.com/how-to-install-temurin-openjdk-on-amazon-linux/)

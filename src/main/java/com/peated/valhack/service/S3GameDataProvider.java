@@ -13,8 +13,6 @@ import java.util.List;
 public class S3GameDataProvider implements GameDataProvider {
     private final S3Client s3Client;
 
-//    private static final String LEAGUE = "vct-international";
-
     public S3GameDataProvider(S3Client s3Client) {
         this.s3Client = s3Client;
     }

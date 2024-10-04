@@ -15,11 +15,27 @@
     <div class="container">
         <header class="mt-4 mb-4">
             <h1>Valhack</h1>
+            <div class="mb-3">
+                <label for="tournamentSelect" class="form-label">Select Tournament</label>
+                <select id="tournamentSelect" class="form-select" name="tournament">
+                    <option th:each="tournament : ${tournaments}" th:value="${tournament}" th:text="${tournament}" th:selected="${tournament == 'VCT_INTERNATIONAL'}"></option>
+                </select>
+            </div>
         </header>
         <main>
+            <h2>Fixture files</h2>
+            <button class="btn btn-primary"
+                    hx-post="/fixture/download"
+                    hx-include="#tournamentSelect"
+                    hx-ext="json-enc"
+                    hx-trigger="click"
+                    hx-swap="afterend"
+            >
+                Download Fixtures
+            </button>
 
             <div class="mt-4">
-                <p>Automatic processing of unprocessed files:</p>
+                <h2>Automatic processing of unprocessed files:</h2>
                 <button class="btn btn-success" hx-post="/process/start" hx-swap="none">Start</button>
                 <button class="btn btn-danger" hx-post="/process/stop" hx-swap="none">Stop</button>
                 <p>
@@ -28,7 +44,7 @@
                 </p>
             </div>
 
-            <p class="lead">Game data currently available:</p>
+            <h2>Game data currently available</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>

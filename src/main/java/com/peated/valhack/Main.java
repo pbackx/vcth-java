@@ -1,5 +1,7 @@
 package com.peated.valhack;
 
+import com.peated.valhack.model.Tournament;
+import com.peated.valhack.service.EsportsFixtureService;
 import com.peated.valhack.service.GameDataProvider;
 import com.peated.valhack.service.GameService;
 import com.peated.valhack.val.ValParser;
@@ -14,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Controller
 @SpringBootApplication
@@ -29,6 +32,9 @@ public class Main implements CommandLineRunner {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private EsportsFixtureService esportsFixtureService;
+
     @Override
     public void run(String... args) throws Exception {
     }
@@ -42,6 +48,7 @@ public class Main implements CommandLineRunner {
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("dataFiles", gameService.getGameFiles());
+        model.addAttribute("tournaments", Arrays.stream(Tournament.values()).map(Tournament::name).toArray());
         return "index";
     }
 
@@ -56,7 +63,26 @@ public class Main implements CommandLineRunner {
         return "process-result :: main";
     }
 
+    @PostMapping("/fixture/download")
+    @ResponseBody
+    public String downloadFixtures(@RequestBody DownloadFixturesRequest request) throws IOException {
+        esportsFixtureService.downloadFixtures(request.getTournament());
+        return "Fixtures downloaded for " + request.getTournament() + ". ";
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+    }
+}
+
+class DownloadFixturesRequest {
+    private String tournament;
+
+    public Tournament getTournament() {
+        return Tournament.valueOf(tournament);
+    }
+
+    public void setTournament(String tournament) {
+        this.tournament = tournament;
     }
 }

@@ -36,10 +36,6 @@ public class MappingDataRepository {
         }
     }
 
-    public List<MappingData> getAllMappingData() {
-        return mappingDataList;
-    }
-
     public MappingData getMappingDataByPlatformGameId(String platformGameId) {
         return mappingDataList.stream()
             .filter(mappingData -> mappingData.platformGameId().equals(platformGameId))
