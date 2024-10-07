@@ -2,6 +2,7 @@ package com.peated.valhack.service;
 
 import com.peated.valhack.model.DataFile;
 import com.peated.valhack.model.DataFileStatus;
+import com.peated.valhack.model.Tournament;
 import com.peated.valhack.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +35,10 @@ public class GameService {
         }
     }
 
-    public List<DataFile> getGameFiles() {
-        var dataFiles = gameDataProvider.getDataFiles();
+    public List<DataFile> getGameFiles(Tournament tournament, String year) {
+        var dataFiles = gameDataProvider.getDataFiles(tournament, year);
         return dataFiles.stream()
-                .map(dataFile -> new DataFile(dataFile, this.getStatus(dataFile)))
+                .map(dataFile -> new DataFile(dataFile, this.getStatus(dataFile), tournament, year))
                 .toList();
     }
 }

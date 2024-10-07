@@ -1,13 +1,5 @@
 package com.peated.valhack;
 
-public class IndexDataFileRequest {
-    private String dataFileId;
+public record IndexDataFileRequest(String dataFileId, String tournament, String year) {
 
-    public String getDataFileId() {
-        return dataFileId;
-    }
-
-    public void setDataFileId(String dataFileId) {
-        this.dataFileId = dataFileId;
-    }
 }

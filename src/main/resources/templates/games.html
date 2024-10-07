@@ -1,0 +1,39 @@
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>File Name</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="element : ${dataFiles}">
+        <td th:text="${element.fileName()}"></td>
+        <td>
+                        <span th:if="${element.status().name() == 'TO_PROCESS'}"
+                              class="badge bg-warning">To Process</span>
+            <span th:if="${element.status().name() == 'DONE'}" class="badge bg-success">Done</span>
+            <span th:if="${element.status().name() == 'ERROR'}" class="badge bg-danger">Error</span>
+        </td>
+        <td>
+            <form
+                    hx-post="/process"
+                    hx-trigger="submit"
+                    hx-target="main"
+                    hx-swap="innerHTML"
+                    hx-ext="json-enc"
+            >
+                <input type="hidden" name="dataFileId" th:value="${element.fileName()}"/>
+                <input type="hidden" name="tournament" th:value="${element.tournament()}"/>
+                <input type="hidden" name="year" th:value="${element.year()}"/>
+                <button
+                        class="btn btn-primary btn-sm"
+                >
+                    <i class="fa-solid fa-spinner htmx-indicator"></i>
+                    Process
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>

@@ -1,7 +1,7 @@
 package com.peated.valhack.service;
 
-import com.peated.valhack.model.DataFile;
 import com.peated.valhack.model.DataFileStatus;
+import com.peated.valhack.model.Tournament;
 import com.peated.valhack.val.ValParser;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -25,22 +25,21 @@ public class BackgroundGameDataProcessingService {
     }
 
     @Async
-    public void startProcess() {
+    public void startProcess(Tournament tournament, String year) {
         running.set(true);
         status = "Loading list of unprocessed files.";
 
-        var unprocessedDataFiles = gameService.getGameFiles().stream()
+        var unprocessedDataFiles = gameService.getGameFiles(tournament, year).stream()
                 .filter(dataFile -> dataFile.status().equals(DataFileStatus.TO_PROCESS))
-                .map(DataFile::fileName)
                 .toList();
 
         status = unprocessedDataFiles.size() + " files to process.";
 
         var count = unprocessedDataFiles.size();
         while (running.get()) {
-            var fileName = unprocessedDataFiles.get(count - 1);
-            status = "Processing " + fileName + ". " + count + " files left.";
-            var resource = gameDataProvider.getDataFile(fileName);
+            var dataFile = unprocessedDataFiles.get(count - 1);
+            status = "Processing " + dataFile + ". " + count + " files left.";
+            var resource = gameDataProvider.getDataResource(dataFile);
             try {
                 valParser.parse(resource);
             } catch (Exception e) {

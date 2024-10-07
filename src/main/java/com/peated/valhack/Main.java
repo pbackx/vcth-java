@@ -1,5 +1,7 @@
 package com.peated.valhack;
 
+import com.peated.valhack.model.DataFile;
+import com.peated.valhack.model.DataFileStatus;
 import com.peated.valhack.model.Tournament;
 import com.peated.valhack.service.EsportsFixtureService;
 import com.peated.valhack.service.GameDataProvider;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @SpringBootApplication
@@ -47,14 +50,19 @@ public class Main implements CommandLineRunner {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("dataFiles", gameService.getGameFiles());
         model.addAttribute("tournaments", Arrays.stream(Tournament.values()).map(Tournament::name).toArray());
         return "index";
     }
 
     @PostMapping("/process")
     public String processData(@RequestBody IndexDataFileRequest request, Model model) throws IOException {
-        Resource resource = gameDataProvider.getDataFile(request.getDataFileId());
+        DataFile dataFile = new DataFile(
+                request.dataFileId(),
+                DataFileStatus.TO_PROCESS,
+                Tournament.valueOf(request.tournament()),
+                request.year()
+        );
+        Resource resource = gameDataProvider.getDataResource(dataFile);
 
         var result = this.valParser.parse(resource);
 
@@ -70,19 +78,22 @@ public class Main implements CommandLineRunner {
         return "Fixtures downloaded for " + request.getTournament() + ". ";
     }
 
+    @GetMapping("/fixture/{tournament}/years")
+    public String getAvailableYears(@PathVariable String tournament, Model model) {
+        List<String> years = gameDataProvider.getAvailableYears(Tournament.valueOf(tournament));
+        model.addAttribute("years", years);
+        return "tournament-years";
+    }
+
+    @GetMapping("/fixture/{tournament}/{year}")
+    public String getGames(@PathVariable String tournament, @PathVariable String year, Model model) {
+        List<DataFile> games = gameService.getGameFiles(Tournament.valueOf(tournament), year);
+        model.addAttribute("dataFiles", games);
+        return "games";
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
 }
 
-class DownloadFixturesRequest {
-    private String tournament;
-
-    public Tournament getTournament() {
-        return Tournament.valueOf(tournament);
-    }
-
-    public void setTournament(String tournament) {
-        this.tournament = tournament;
-    }
-}

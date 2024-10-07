@@ -1,0 +1,13 @@
+<form hx-ext="path-params">
+    <label for="yearSelect" class="form-label">Select tournament year</label>
+    <select class="form-select" id="yearSelect" name="year">
+        <option th:each="year : ${years}" th:value="${year}" th:text="${year}"></option>
+    </select>
+    <button type="submit"
+            class="btn btn-primary"
+            hx-get="/fixture/{tournament}/{year}"
+            hx-include="#yearSelect, #tournamentSelect"
+            hx-target="#games-table"
+            hx-swap="innerHTML"
+    >Load games</button>
+</form>
