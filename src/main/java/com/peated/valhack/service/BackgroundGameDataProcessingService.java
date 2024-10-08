@@ -41,7 +41,7 @@ public class BackgroundGameDataProcessingService {
             status = "Processing " + dataFile + ". " + count + " files left.";
             var resource = gameDataProvider.getDataResource(dataFile);
             try {
-                valParser.parse(resource);
+                valParser.parse(tournament, resource);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

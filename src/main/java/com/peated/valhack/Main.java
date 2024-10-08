@@ -8,7 +8,6 @@ import com.peated.valhack.service.GameDataProvider;
 import com.peated.valhack.service.GameService;
 import com.peated.valhack.val.ValParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.Resource;
@@ -24,7 +23,7 @@ import java.util.List;
 @Controller
 @SpringBootApplication
 @EnableAsync
-public class Main implements CommandLineRunner {
+public class Main {
 
     @Autowired
     private GameDataProvider gameDataProvider;
@@ -37,10 +36,6 @@ public class Main implements CommandLineRunner {
 
     @Autowired
     private EsportsFixtureService esportsFixtureService;
-
-    @Override
-    public void run(String... args) throws Exception {
-    }
 
     @GetMapping("/data/{id}")
     @ResponseBody
@@ -56,15 +51,16 @@ public class Main implements CommandLineRunner {
 
     @PostMapping("/process")
     public String processData(@RequestBody IndexDataFileRequest request, Model model) throws IOException {
+        Tournament tournament = Tournament.valueOf(request.tournament());
         DataFile dataFile = new DataFile(
                 request.dataFileId(),
                 DataFileStatus.TO_PROCESS,
-                Tournament.valueOf(request.tournament()),
+                tournament,
                 request.year()
         );
         Resource resource = gameDataProvider.getDataResource(dataFile);
 
-        var result = this.valParser.parse(resource);
+        var result = this.valParser.parse(tournament, resource);
 
         model.addAttribute("result", result);
 

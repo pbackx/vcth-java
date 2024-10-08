@@ -8,18 +8,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import com.peated.valhack.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peated.valhack.model.Agent;
-import com.peated.valhack.model.Game;
-import com.peated.valhack.model.Player;
-import com.peated.valhack.model.PlayerRef;
-import com.peated.valhack.model.SelectedAgent;
-import com.peated.valhack.model.Team;
 import com.peated.valhack.repository.AgentRepository;
 import com.peated.valhack.repository.GameRepository;
 import com.peated.valhack.repository.MappingDataRepository;
@@ -53,7 +48,7 @@ public class ValParser {
     public ValParser() {
     }
 
-    public String parse(Resource resource) throws IOException {
+    public String parse(Tournament tournament, Resource resource) throws IOException {
         var result = new StringBuilder();
         try (var gzipInputStream = new GZIPInputStream(resource.getInputStream());
              var reader = new InputStreamReader(gzipInputStream);
@@ -96,7 +91,7 @@ public class ValParser {
 
             for (JsonNode player : configurationNode.get("players")) {
                 var localPlayerId = player.get("playerId").get("value").asInt();
-                var playerMappingDataId = getPlayerMappingDataId(platformGameId, localPlayerId);
+                var playerMappingDataId = getPlayerMappingDataId(tournament, platformGameId, localPlayerId);
                 players.put(localPlayerId, this.createOrUpdatePlayer(player, playerMappingDataId));
 
                 var selectedAgent = player.get("selectedAgent");
@@ -117,7 +112,7 @@ public class ValParser {
 
             for (JsonNode team : configurationNode.get("teams")) {
                 var localTeamId = team.get("teamId").get("value").asInt();
-                var teamMappingDataId = getTeamMappingDataId(platformGameId, localTeamId);
+                var teamMappingDataId = getTeamMappingDataId(tournament, platformGameId, localTeamId);
                 teams.put(localTeamId, this.createOrUpdateTeam(team, teamMappingDataId, players));
             }
 
@@ -150,7 +145,7 @@ public class ValParser {
             var winningTeamId = teams.get(localWinningTeamId).id();
             var losingTeamId = teams.get(localLosingTeamId).id();
 
-            var game = createOrUpdateGame(platformGameId, winningTeamId, losingTeamId);
+            var game = createOrUpdateGame(tournament, platformGameId, winningTeamId, losingTeamId);
 
             for (Map.Entry<Integer, Agent> entry : agentsForPlayer.entrySet()) {
                 var playerId = entry.getKey();
@@ -171,13 +166,13 @@ public class ValParser {
         return result.toString();
     }
 
-    private String getPlayerMappingDataId(String platformGameId, int localPlayerId) {
-        var mappingData = mappingDataRepository.getMappingDataByPlatformGameId(platformGameId);
+    private String getPlayerMappingDataId(Tournament tournament, String platformGameId, int localPlayerId) {
+        var mappingData = mappingDataRepository.getMappingDataByPlatformGameId(tournament, platformGameId);
         return mappingData.participantMapping().get(localPlayerId);
     }
 
-    private String getTeamMappingDataId(String platformGameId, int localTeamId) {
-        var mappingData = mappingDataRepository.getMappingDataByPlatformGameId(platformGameId);
+    private String getTeamMappingDataId(Tournament tournament, String platformGameId, int localTeamId) {
+        var mappingData = mappingDataRepository.getMappingDataByPlatformGameId(tournament, platformGameId);
         return mappingData.teamMapping().get(localTeamId);
     }
 
@@ -216,11 +211,11 @@ public class ValParser {
         }
     }
 
-    private Game createOrUpdateGame(String platformGameId, int winningTeamId, int losingTeamId) {
-        var game = new Game(null, platformGameId, winningTeamId, losingTeamId);
+    private Game createOrUpdateGame(Tournament tournament, String platformGameId, int winningTeamId, int losingTeamId) {
+        var game = new Game(null, platformGameId, winningTeamId, losingTeamId, tournament.getId());
         if (gameRepository.existsByPlatformGameId(platformGameId)) {
             Game existingGame = gameRepository.findByPlatformGameId(platformGameId).get();
-            return gameRepository.save(new Game(existingGame.id(), platformGameId, winningTeamId, losingTeamId));
+            return gameRepository.save(new Game(existingGame.id(), platformGameId, winningTeamId, losingTeamId, tournament.getId()));
         } else {
             return gameRepository.save(game);
         }

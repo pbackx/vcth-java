@@ -1,6 +1,7 @@
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
+	id 'org.flywaydb.flyway' version '10.19.0'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -21,7 +22,14 @@ dependencies {
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 
-
 	implementation 'com.h2database:h2'
+	implementation 'org.flywaydb:flyway-core'
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+flyway {
+	url = "jdbc:h2:file:${System.getProperty('user.dir')}/valhack;AUTO_SERVER=TRUE"
+	baselineOnMigrate = true
+	baselineVersion = "1"
 }
