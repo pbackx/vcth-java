@@ -148,7 +148,8 @@ public class ValParser {
             var game = createOrUpdateGame(tournament, platformGameId, winningTeamId, losingTeamId);
 
             for (Map.Entry<Integer, Agent> entry : agentsForPlayer.entrySet()) {
-                var playerId = entry.getKey();
+                var localPlayerId = entry.getKey();
+                var playerId = players.get(localPlayerId).id();
                 var agent = entry.getValue();
                 var selectedAgent = new SelectedAgent(
                     game.id(), playerId, agent.id()
