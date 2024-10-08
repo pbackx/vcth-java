@@ -28,6 +28,10 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
+bootRun {
+	jvmArgs = ['-Xmx6g']
+}
+
 flyway {
 	url = "jdbc:h2:file:${System.getProperty('user.dir')}/valhack;AUTO_SERVER=TRUE"
 	baselineOnMigrate = true
