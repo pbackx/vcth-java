@@ -2,6 +2,7 @@ package com.peated.valhack.service;
 
 import com.peated.valhack.model.DataFile;
 import com.peated.valhack.model.Tournament;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @Component
+@Profile("s3")
 public class S3GameDataProvider implements GameDataProvider {
     private final S3Client s3Client;
 
