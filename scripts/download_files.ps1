@@ -19,6 +19,10 @@ foreach ($file in $files) {
         New-Item -ItemType Directory -Path $localDirectory | Out-Null
     }
 
-    # Copy the file from S3 to the local directory with the updated filename
-    aws s3 cp "s3://$bucket/$file" "$localPath"
+    # Copy the file from S3 to the local directory with the updated filename if it does not already exist
+    if (-not (Test-Path $localPath)) {
+        aws s3 cp "s3://$bucket/$file" "$localPath"
+    } else {
+        Write-Output "File $localPath already exists. Skipping..."
+    }
 }
