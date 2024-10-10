@@ -205,7 +205,8 @@ public class ValParser {
 
         if (teamRepository.existsByMappingDataId(teamObj.mappingDataId())) {
             Team existingTeam = teamRepository.findByMappingDataId(teamObj.mappingDataId()).get();
-            existingTeam = new Team(existingTeam.id(), teamObj.name(), existingTeam.mappingDataId(), teamObj.players());
+            playersInTeam.addAll(existingTeam.players());
+            existingTeam = new Team(existingTeam.id(), teamObj.name(), existingTeam.mappingDataId(), playersInTeam);
             return teamRepository.save(existingTeam);
         } else {
             return teamRepository.save(teamObj);
