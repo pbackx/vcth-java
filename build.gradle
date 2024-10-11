@@ -8,7 +8,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+java.sourceCompatibility = '21'
 
 repositories {
 	mavenCentral()
@@ -25,7 +25,10 @@ dependencies {
 	implementation 'com.h2database:h2'
 	implementation 'org.flywaydb:flyway-core'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
+    implementation 'com.amazonaws:aws-lambda-java-events:3.14.0'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 bootRun {
@@ -36,4 +39,55 @@ flyway {
 	url = "jdbc:h2:file:${System.getProperty('user.dir')}/valhack;AUTO_SERVER=TRUE"
 	baselineOnMigrate = true
 	baselineVersion = "1"
+}
+
+tasks.register('buildLambdaJar', Jar) {
+    dependsOn "copyRuntimeDependencies"
+
+    configurations {
+        lambdaImplementation {
+            extendsFrom configurations.implementation
+            exclude group: 'org.springframework.boot'
+        }
+    }
+
+    from sourceSets.main.output
+    dependsOn configurations.lambdaImplementation
+
+    manifest {
+        attributes(
+                'Main-Class': 'com.peated.valhack.lambda.LambdaHandler'
+        )
+    }
+
+    archiveBaseName.set('vcth-lambda')
+    archiveVersion.set('0.0.1-SNAPSHOT')
+    destinationDirectory.set(file("$buildDir/libs"))
+}
+
+tasks.register('copyRuntimeDependencies', Copy) {
+    from configurations.runtimeClasspath
+    into 'build/dependency'
+}
+
+tasks.register('buildLambdaDependencyLayer', Zip) {
+    dependsOn 'copyRuntimeDependencies'
+    into('java/lib') {
+        from 'build/dependency'
+    }
+    archiveFileName.set('vcth-lambda-dependencies.zip')
+}
+
+tasks.register('buildLambdaDataLayer', Zip) {
+    dependsOn 'copyRuntimeDependencies'
+    from('valhack.mv.db')
+    archiveFileName.set('vcth-lambda-data.zip')
+}
+
+tasks.register('buildLambda', Zip) {
+    dependsOn 'buildLambdaJar', 'buildLambdaDependencyLayer', 'buildLambdaDataLayer'
+    into('lib') {
+        from 'build/libs/vcth-lambda-0.0.1-SNAPSHOT.jar'
+    }
+    archiveFileName.set('vcth-lambda.zip')
 }
