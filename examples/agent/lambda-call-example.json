@@ -1,0 +1,22 @@
+{
+  "messageVersion": "1.0",
+  "function": "get_team_composition",
+  "parameters": [
+    {
+      "name": "tournament",
+      "type": "string",
+      "value": "VCT International"
+    }
+  ],
+  "sessionId": "066151327090367",
+  "agent": {
+    "name": "vcth-agent",
+    "version": "DRAFT",
+    "id": "XE4ZTBU4MR",
+    "alias": "TSTALIASID"
+  },
+  "inputText": "Build a team using only players from VCT International. Assign  roles to  each player and explain why this composition would be effective  in a  competitive match.",
+  "sessionAttributes": {},
+  "promptSessionAttributes": {},
+  "actionGroup": "vcth-action-group"
+}

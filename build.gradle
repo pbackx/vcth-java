@@ -26,7 +26,6 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
-    implementation 'com.amazonaws:aws-lambda-java-events:3.14.0'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
@@ -42,7 +41,7 @@ flyway {
 }
 
 tasks.register('buildLambdaJar', Jar) {
-    dependsOn "copyRuntimeDependencies"
+    dependsOn "build", "copyRuntimeDependencies"
 
     configurations {
         lambdaImplementation {
@@ -85,7 +84,7 @@ tasks.register('buildLambdaDataLayer', Zip) {
 }
 
 tasks.register('buildLambda', Zip) {
-    dependsOn 'buildLambdaJar', 'buildLambdaDependencyLayer', 'buildLambdaDataLayer'
+    dependsOn 'buildLambdaJar'
     into('lib') {
         from 'build/libs/vcth-lambda-0.0.1-SNAPSHOT.jar'
     }

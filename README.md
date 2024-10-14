@@ -55,6 +55,8 @@ This is going to be the input for a chatbot that will decide the best team compo
 
 ## Running on EC2
 
+?? I decided to skip running on EC2. The data is not that big and the processing is not that heavy. I can run it fine on my machine.
+
 With regard to permissions, it is easiest to give your EC2 instance a role that has read access to S3.
 
 Adoptium / Temuring on Amazon Linux is a manual process:
@@ -76,3 +78,28 @@ Add the following to your `.bashrc`:
 
 You may want to update the Java alternatives, but I did not bother for now.
 [Here are more instructions](https://techviewleo.com/how-to-install-temurin-openjdk-on-amazon-linux/)
+
+## Building and Deploying the Lambda
+
+This should probably be automated a bit more, but this is how it works right now:
+
+1. Build the jar and zip file: `gradle buildLambda`
+2. Upload the zip file to AWS lambda
+
+Note that there are two layers that need to be added to the lambda:
+
+1. one layer with all the dependencies: `gradle buildLambdaDependencyLayer`
+2. one with the H2 database file: `gradle buildLambdaDataLayer` (You may need to close any open connections to the database)
+
+Note: For the agent to call the lambda, permission needs to be set on the Lambda. It looks like this is currently not possible
+through the console, as the console will ask for an ARN, which is not available for the agent. You can set the permission
+via the CLI:
+    
+    aws lambda add-permission --function-name "lambda-arn" --statement-id "vcth-agent-access" --action "lambda:InvokeFunction" --principal "bedrock.amazonaws.com"
+
+There is a `Dockerfile` to test the changes locally:
+
+1. Build the jar: `gradle buildLambdaJar`
+2. Build the image: `docker build -t valhack-lambda .`
+3. Run the image: `docker run -p 9000:8080 valhack-lambda:latest`
+
