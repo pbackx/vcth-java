@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.peated.valhack.model.Role;
 import org.springframework.stereotype.Component;
 
 @Component
 final public class AgentToRoleMapper {
-    public final record AgentData(String guid, String name, Role role) {}
+    public record AgentData(String guid, String name, Role role) {}
 
     public static final List<AgentData> AGENTS = List.of(
         new AgentData("add6443a-41bd-e414-f6ad-e58d267f4e95", "Jett", Role.Duelist),
@@ -37,24 +38,6 @@ final public class AgentToRoleMapper {
         new AgentData("1dbf2edd-4729-0984-3115-daa5eed44993", "Clove", Role.Controller),
         new AgentData("efba5359-4016-a1e5-7626-b1ae76895940", "Vyse", Role.Sentinel)
     );
-
-    public static enum Role {
-        // Ideally this should be loaded from the database... I know...
-        Duelist(1),
-        Initiator(2),
-        Controller(3),
-        Sentinel(4);
-
-        private final int id;
-
-        Role(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-    }
 
     private final Map<String, Integer> agentGuidtoRoleId;
 
