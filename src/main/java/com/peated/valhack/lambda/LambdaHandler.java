@@ -156,7 +156,7 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, tournament.getId());
 
-            try (ResultSet rs = stmt.executeQuery(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     var winning = rs.getString("winning_team_composition");
                     var losing = rs.getString("losing_team_composition");
