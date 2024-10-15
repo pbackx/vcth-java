@@ -26,5 +26,5 @@ SELECT ID    AS game_id,
            GROUP BY TEAM_ID
            ) AS losing_team_composition
 FROM GAME
-WHERE TOURNAMENT_ID = 2
+WHERE TOURNAMENT_ID = ?
 LIMIT 50;

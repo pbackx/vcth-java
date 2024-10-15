@@ -5,4 +5,4 @@ from PLAYER
          join agent on (selected_agent.AGENT_ID = AGENT.ID and AGENT.ROLE_ID = ?)
 group by PLAYER.ID
 order by count(*) desc
-limit 100;
+limit 50;

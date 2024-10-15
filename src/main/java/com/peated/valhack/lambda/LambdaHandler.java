@@ -153,26 +153,28 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
     public String getTeamComposition(Tournament tournament, int year) {
         String query = getQuery("team-composition.sql");
         List<TeamComposition> teamCompositions = new ArrayList<>();
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, tournament.getId());
 
-            while (rs.next()) {
-                var winning = rs.getString("winning_team_composition");
-                var losing = rs.getString("losing_team_composition");
-                teamCompositions.add(new TeamComposition(winning, losing));
+            try (ResultSet rs = stmt.executeQuery(query)) {
+                while (rs.next()) {
+                    var winning = rs.getString("winning_team_composition");
+                    var losing = rs.getString("losing_team_composition");
+                    teamCompositions.add(new TeamComposition(winning, losing));
+                }
+
+                var compositionStr = new StringBuilder("| Winning Team | Losing Team |\n");
+                for (var teamComposition : teamCompositions) {
+                    compositionStr
+                            .append("| ")
+                            .append(teamComposition.winningTeam())
+                            .append(" | ")
+                            .append(teamComposition.losingTeam())
+                            .append(" |\n");
+                }
+
+                return compositionStr.toString();
             }
-
-            var compositionStr = new StringBuilder("| Winning Team | Losing Team |\n");
-            for (var teamComposition : teamCompositions) {
-                compositionStr
-                        .append("| ")
-                        .append(teamComposition.winningTeam())
-                        .append(" | ")
-                        .append(teamComposition.losingTeam())
-                        .append(" |\n");
-            }
-
-            return compositionStr.toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
