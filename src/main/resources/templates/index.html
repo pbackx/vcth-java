@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,65 +13,107 @@
     <script src="https://unpkg.com/htmx.org@2.0.1"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/path-params.js"></script>
+
+    <style>
+        .lds-dual-ring,
+        .lds-dual-ring:after {
+            box-sizing: border-box;
+        }
+
+        .lds-dual-ring {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+        }
+
+        .lds-dual-ring:after {
+            content: " ";
+            display: block;
+            width: 32px;
+            height: 32px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6.4px solid currentColor;
+            border-color: currentColor transparent currentColor transparent;
+            animation: lds-dual-ring 1.2s linear infinite;
+        }
+
+        @keyframes lds-dual-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-indicator {
+            opacity: 0;
+        }
+
+        #loading-indicator.htmx-request {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <header class="mt-4 mb-4">
-        <h1>Valhack</h1>
-        <div class="mb-3">
-            <label for="tournamentSelect" class="form-label">Select Tournament</label>
-            <select id="tournamentSelect" class="form-select" name="tournament">
-                <option th:each="tournament : ${tournaments}" th:value="${tournament}" th:text="${tournament}"
-                        th:selected="${tournament == 'VCT_INTERNATIONAL'}"></option>
-            </select>
-        </div>
-    </header>
+<div class="container py-5">
     <main>
-        <h2>Fixture files</h2>
-        <button class="btn btn-primary"
-                hx-post="/fixture/download"
-                hx-include="#tournamentSelect"
-                hx-ext="json-enc"
-                hx-trigger="click"
-                hx-swap="afterend"
-        >
-            Download Fixtures
-        </button>
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-6">
 
-        <div class="mt-4">
-            <h2>Automatic processing of unprocessed files:</h2>
-            <button class="btn btn-success"
-                    hx-post="/process/start"
-                    hx-include="#tournamentSelect, #yearSelect"
-                    hx-swap="none">
-                Start
-            </button>
-            <button class="btn btn-danger" hx-post="/process/stop" hx-swap="none">Stop</button>
-            <p>
-                Current status:
-                <span hx-get="/process/status" hx-trigger="load, every 5s" hx-swap="innerHTML"></span>
-            </p>
-        </div>
+                <div class="card" id="chat2">
+                    <div class="card-header d-flex justify-content-between align-items-center p-3">
+                        <h5 class="mb-0">Valchat</h5>
+                        <a href="https://github.com/pbackx/vcth-java" class="btn btn-primary btn-sm">GitHub Project</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="chat-messages">
+                            <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                                <div>
+                                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">
+                                        Welcome, I am here to help you create your Valorant dream team.
+                                    </p>
+                                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">
+                                        Please note that my response time it quite slow ⏳ It can take a minute before
+                                        I reply 🦥 My creator is working on that.
+                                    </p>
+                                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">
+                                        Ask me any question, such as: "Build a team using only players from VCT International.
+                                        Assign roles to each player and explain why this composition would be effective in a
+                                        competitive match."
+                                    </p>
+                                </div>
+                                <i class="fa-solid fa-brain fa-3x"></i>
+                            </div>
+                        </div>
+                        <div id="loading-indicator">
+                            <div class="lds-dual-ring"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted p-3">
+                        <form hx-post="/message"
+                              hx-ext="json-enc"
+                              hx-target="#chat-messages"
+                              hx-swap="beforeend"
+                              hx-on::before-request="this.querySelector('button').disabled = true; this.querySelector('textarea').disabled = true"
+                              hx-on::after-request="this.reset(); this.querySelector('button').disabled = false; this.querySelector('textarea').disabled = false"
+                              hx-indicator="#loading-indicator"
+                              class="d-flex justify-content-start align-items-center"
+                        >
+                            <i class="fa-solid fa-circle-user fa-3x"></i>
+                            <textarea class="form-control form-control-lg p-2 ms-3 mb-1"
+                                      id="userMessage"
+                                      name="userMessage"
+                                      rows="4"></textarea>
+                            <button class="btn ms-3"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
 
-        <h2>Game data currently available</h2>
-        <div hx-ext="path-params">
-            <button class="btn btn-primary"
-                    hx-get="/fixture/{tournament}/years"
-                    hx-include="#tournamentSelect"
-                    hx-trigger="click"
-                    hx-target="#yearSelectWrapper"
-                    hx-swap="innerHTML"
-            >
-                Refresh available years
-            </button>
-            <div id="yearSelectWrapper"></div>
-        </div>
-        <div id="games-table">
+            </div>
         </div>
     </main>
-    <footer class="mt-4">
-        <p><a href="https://github.com/pbackx/vcth-java">GitHub Project</a></p>
-    </footer>
 </div>
 
 <!-- Bootstrap JS (optional) -->

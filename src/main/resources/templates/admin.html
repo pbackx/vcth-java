@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valhack</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/path-params.js"></script>
+</head>
+<body>
+<div class="container">
+    <header class="mt-4 mb-4">
+        <h1>Valhack</h1>
+        <div class="mb-3">
+            <label for="tournamentSelect" class="form-label">Select Tournament</label>
+            <select id="tournamentSelect" class="form-select" name="tournament">
+                <option th:each="tournament : ${tournaments}" th:value="${tournament}" th:text="${tournament}"
+                        th:selected="${tournament == 'VCT_INTERNATIONAL'}"></option>
+            </select>
+        </div>
+    </header>
+    <main>
+        <h2>Fixture files</h2>
+        <button class="btn btn-primary"
+                hx-post="/fixture/download"
+                hx-include="#tournamentSelect"
+                hx-ext="json-enc"
+                hx-trigger="click"
+                hx-swap="afterend"
+        >
+            Download Fixtures
+        </button>
+
+        <div class="mt-4">
+            <h2>Automatic processing of unprocessed files:</h2>
+            <button class="btn btn-success"
+                    hx-post="/process/start"
+                    hx-include="#tournamentSelect, #yearSelect"
+                    hx-swap="none">
+                Start
+            </button>
+            <button class="btn btn-danger" hx-post="/process/stop" hx-swap="none">Stop</button>
+            <p>
+                Current status:
+                <span hx-get="/process/status" hx-trigger="load, every 5s" hx-swap="innerHTML"></span>
+            </p>
+        </div>
+
+        <h2>Game data currently available</h2>
+        <div hx-ext="path-params">
+            <button class="btn btn-primary"
+                    hx-get="/fixture/{tournament}/years"
+                    hx-include="#tournamentSelect"
+                    hx-trigger="click"
+                    hx-target="#yearSelectWrapper"
+                    hx-swap="innerHTML"
+            >
+                Refresh available years
+            </button>
+            <div id="yearSelectWrapper"></div>
+        </div>
+        <div id="games-table">
+        </div>
+    </main>
+    <footer class="mt-4">
+        <p><a href="https://github.com/pbackx/vcth-java">GitHub Project</a></p>
+    </footer>
+</div>
+
+<!-- Bootstrap JS (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import com.peated.valhack.service.EsportsFixtureService;
 import com.peated.valhack.service.GameDataProvider;
 import com.peated.valhack.service.GameService;
 import com.peated.valhack.val.ValParser;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.peated.valhack.service.BedrockAgentService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.Resource;
@@ -25,17 +25,19 @@ import java.util.List;
 @EnableAsync
 public class Main {
 
-    @Autowired
-    private GameDataProvider gameDataProvider;
+    private final GameDataProvider gameDataProvider;
+    private final ValParser valParser;
+    private final GameService gameService;
+    private final EsportsFixtureService esportsFixtureService;
+    private final BedrockAgentService bedrockAgentService;
 
-    @Autowired
-    private ValParser valParser;
-
-    @Autowired
-    private GameService gameService;
-
-    @Autowired
-    private EsportsFixtureService esportsFixtureService;
+    public Main(GameDataProvider gameDataProvider, ValParser valParser, GameService gameService, EsportsFixtureService esportsFixtureService, BedrockAgentService bedrockAgentService) {
+        this.gameDataProvider = gameDataProvider;
+        this.valParser = valParser;
+        this.gameService = gameService;
+        this.esportsFixtureService = esportsFixtureService;
+        this.bedrockAgentService = bedrockAgentService;
+    }
 
     @GetMapping("/data/{id}")
     @ResponseBody
@@ -45,8 +47,35 @@ public class Main {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("tournaments", Arrays.stream(Tournament.values()).map(Tournament::name).toArray());
         return "index";
+    }
+
+    record UserMessageRequest(String userMessage) { }
+
+    @PostMapping("/message")
+    public String answer(@RequestBody UserMessageRequest body, Model model) {
+        model.addAttribute("message", body.userMessage());
+        model.addAttribute("response", bedrockAgentService.getResponse(body.userMessage(), "TODO"));
+
+//        var r = """
+//The team I would assemble consists of:
+//
+//Sentinel: FNC Alfajer
+//Initiator 1: DRX stax
+//Initiator 2: NRG crashies
+//Duelist: LEV aspas
+//Controller: DRX MaKo
+//
+//This composition balances the key roles needed in competitive matches. The two elite Initiators stax and crashies can effectively gather information and set up plays for the aggressive Duelist aspas to get opening picks. Alfajer as the Sentinel can anchor sites with his utility, while MaKo controls areas with his Controller smokes and abilities.\s
+//""";
+//        model.addAttribute("response", r);
+        return "message :: main";
+    }
+
+    @GetMapping("/admin")
+    public String admin(Model model) {
+        model.addAttribute("tournaments", Arrays.stream(Tournament.values()).map(Tournament::name).toArray());
+        return "admin";
     }
 
     @PostMapping("/process")
