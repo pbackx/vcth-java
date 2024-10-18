@@ -8,6 +8,7 @@ public record Game(
         String platformGameId,
         @Column("WINNING_TEAM_ID") Integer winningTeamId,
         @Column("LOSING_TEAM_ID") Integer losingTeamId,
-        Integer tournamentId
+        Integer tournamentId,
+        Integer gameYear
 ) {
 }

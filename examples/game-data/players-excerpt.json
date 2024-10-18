@@ -1,0 +1,33 @@
+[{
+  "id": "107025876564296044",
+  "handle": "Toma",
+  "first_name": "Tommi",
+  "last_name": "Lehtinen",
+  "status": "active",
+  "photo_url": "http://static.lolesports.com/players/1633033031951_silhouette.png",
+  "home_team_id": "106652238530500027",
+  "created_at": "2021-10-01T11:19:00Z",
+  "updated_at": "2021-10-01T11:19:00Z"
+},
+{
+  "id": "106977714184829995",
+  "handle": "Stefanie",
+  "first_name": "Stefanie",
+  "last_name": "Jones",
+  "status": "active",
+  "photo_url": "http://static.lolesports.com/players/1632350373533_silhouette-female.png",
+  "home_team_id": "106976771652907805",
+  "created_at": "2021-09-22T22:41:26Z",
+  "updated_at": "2023-04-09T14:50:55Z"
+},
+{
+  "id": "107176790303905255",
+  "handle": "aRth",
+  "first_name": "Arthur",
+  "last_name": "Hardman",
+  "status": "active",
+  "photo_url": null,
+  "home_team_id": "107174817570297246",
+  "created_at": "2021-10-28T14:16:57Z",
+  "updated_at": "2021-11-01T13:52:31Z"
+}]

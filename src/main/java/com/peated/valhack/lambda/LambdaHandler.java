@@ -132,11 +132,12 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
                 while (rs.next()) {
                     players.add("| " + rs.getString("id") +
                             " | " + rs.getString("name") +
-                            " | " + rs.getString("count") + " |");
+                            " | " + rs.getString("count") +
+                            " | " + rs.getString("region") + " |");
                 }
             }
 
-            var playerStr = new StringBuilder("| Player ID | Player Name | Times Played |\n");
+            var playerStr = new StringBuilder("| Player ID | Player Name | Times Played | Region |\n");
             for (var player : players) {
                 playerStr
                         .append(player)

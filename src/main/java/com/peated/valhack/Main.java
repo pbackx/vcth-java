@@ -89,7 +89,7 @@ public class Main {
         );
         Resource resource = gameDataProvider.getDataResource(dataFile);
 
-        var result = this.valParser.parse(tournament, resource);
+        var result = this.valParser.parse(tournament, Integer.parseInt(request.year()), resource);
 
         model.addAttribute("result", result);
 
