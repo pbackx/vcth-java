@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.bedrockagentruntime.model.InvokeAgentResp
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 @Service
 public class BedrockAgentService {
@@ -34,12 +35,11 @@ public class BedrockAgentService {
     public String getResponse(String message, String session) {
         var finalCompletion = new AtomicReference<>("");
 
-        var request = InvokeAgentRequest.builder()
+        Consumer<InvokeAgentRequest.Builder> request = (InvokeAgentRequest.Builder builder) -> builder
                 .agentId("XE4ZTBU4MR")
-                .agentAliasId("0KKNAR1ENB") // can also use TSTALIASID for testing https://docs.aws.amazon.com/bedrock/latest/userguide/agents-test.html
+                .agentAliasId("5INJP6N3EH") // can also use TSTALIASID for testing https://docs.aws.amazon.com/bedrock/latest/userguide/agents-test.html
                 .inputText(message)
-                .sessionId(session)
-                .build();
+                .sessionId(session);
 
         var visitor = InvokeAgentResponseHandler.Visitor.builder()
                 .onChunk(chunk -> finalCompletion.set(finalCompletion.get() + chunk.bytes().asUtf8String()))
@@ -47,12 +47,24 @@ public class BedrockAgentService {
 
         var handler = InvokeAgentResponseHandler.builder()
                 .subscriber(visitor)
+                .onError(e -> finalCompletion.set(
+                        "I am sorry, but I can not answer your question at the moment.\n" +
+                                "The agent returned the following error:\n" +
+                                e.getMessage())
+                )
                 .build();
 
-        bedrockAgentRuntimeClient.invokeAgent(
-                request,
-                handler
-        ).join();
+        try {
+            bedrockAgentRuntimeClient.invokeAgent(
+                    request,
+                    handler
+            ).join();
+        } catch (Exception e) {
+            finalCompletion.set(
+                    "I am sorry, but I can not answer your question at the moment.\n" +
+                            "The agent returned the following error:\n" +
+                            e.getMessage());
+        }
 
         return finalCompletion.get();
     }

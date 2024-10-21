@@ -8,6 +8,8 @@ import com.peated.valhack.service.GameDataProvider;
 import com.peated.valhack.service.GameService;
 import com.peated.valhack.val.ValParser;
 import com.peated.valhack.service.BedrockAgentService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.Resource;
@@ -53,9 +55,24 @@ public class Main {
     record UserMessageRequest(String userMessage) { }
 
     @PostMapping("/message")
-    public String answer(@RequestBody UserMessageRequest body, Model model) {
+    public String answer(@RequestBody UserMessageRequest body, Model model, HttpServletRequest request) {
+        String sessionId = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("sessionId".equals(cookie.getName())) {
+                    sessionId = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        if (sessionId == null) {
+            sessionId = java.util.UUID.randomUUID().toString();
+        }
+
+        System.out.println("sessionId: " + sessionId);
+
         model.addAttribute("message", body.userMessage());
-        model.addAttribute("response", bedrockAgentService.getResponse(body.userMessage(), "TODO"));
+        model.addAttribute("response", bedrockAgentService.getResponse(body.userMessage(), sessionId));
 
 //        var r = """
 //The team I would assemble consists of:
