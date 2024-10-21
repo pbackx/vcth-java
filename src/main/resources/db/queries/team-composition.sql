@@ -27,4 +27,5 @@ SELECT ID    AS game_id,
            ) AS losing_team_composition
 FROM GAME
 WHERE TOURNAMENT_ID = ?
+AND GAME_YEAR = ?
 LIMIT 50;

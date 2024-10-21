@@ -156,6 +156,7 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
         List<TeamComposition> teamCompositions = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, tournament.getId());
+            stmt.setInt(2, year);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
