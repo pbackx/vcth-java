@@ -93,3 +93,12 @@ tasks.register('buildLambda', Zip) {
     }
     archiveFileName.set('vcth-lambda.zip')
 }
+
+tasks.register("packageElasticBeanstalk", Zip) {
+    dependsOn "bootJar"
+    from("build/libs/vcth-java-0.0.1-SNAPSHOT.jar")
+    into(".platform") {
+        from(".platform")
+    }
+    archiveFileName.set("vcth-eb.zip")
+}
