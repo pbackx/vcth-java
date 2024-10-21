@@ -39,6 +39,9 @@ public class ValParser {
     private MappingDataRepository mappingDataRepository;
 
     @Autowired
+    private PlayerDataRepository playerDataRepository;
+
+    @Autowired
     private RegionService regionService;
 
     @Autowired
@@ -178,11 +181,27 @@ public class ValParser {
     }
 
     private Player createOrUpdatePlayer(JsonNode player, String playerMappingDataId) {
-        var playerObj = new Player(null, player.get("displayName").asText(), playerMappingDataId);
+        var playerData = playerDataRepository.getPlayerDataByMappingDataId(playerMappingDataId);
+
+        var playerObj = new Player(
+                null,
+                player.get("displayName").asText(),
+                playerMappingDataId,
+                playerData != null ? playerData.handle() : null,
+                playerData != null ? playerData.firstName() : null,
+                playerData != null ? playerData.lastName() : null
+        );
 
         if (playerRepository.existsByMappingDataId(playerObj.mappingDataId())) {
             Player existingPlayer = playerRepository.findByMappingDataId(playerObj.mappingDataId()).get();
-            existingPlayer = new Player(existingPlayer.id(), playerObj.name(), existingPlayer.mappingDataId());
+            existingPlayer = new Player(
+                    existingPlayer.id(),
+                    playerObj.name(),
+                    existingPlayer.mappingDataId(),
+                    playerObj.handle(),
+                    playerObj.firstName(),
+                    playerObj.lastName()
+            );
             return playerRepository.save(existingPlayer);
         } else {
             return playerRepository.save(playerObj);
