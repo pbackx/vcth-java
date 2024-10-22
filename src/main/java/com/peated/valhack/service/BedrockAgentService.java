@@ -37,7 +37,7 @@ public class BedrockAgentService {
 
         Consumer<InvokeAgentRequest.Builder> request = (InvokeAgentRequest.Builder builder) -> builder
                 .agentId("XE4ZTBU4MR")
-                .agentAliasId("5INJP6N3EH") // can also use TSTALIASID for testing https://docs.aws.amazon.com/bedrock/latest/userguide/agents-test.html
+                .agentAliasId("U1TLMI3ZDT") // can also use TSTALIASID for testing https://docs.aws.amazon.com/bedrock/latest/userguide/agents-test.html
                 .inputText(message)
                 .sessionId(session);
 
