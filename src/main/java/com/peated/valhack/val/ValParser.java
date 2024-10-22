@@ -42,6 +42,9 @@ public class ValParser {
     private PlayerDataRepository playerDataRepository;
 
     @Autowired
+    private TeamDataRepository teamDataRepository;
+
+    @Autowired
     private RegionService regionService;
 
     @Autowired
@@ -116,7 +119,7 @@ public class ValParser {
                 var localTeamId = team.get("teamId").get("value").asInt();
                 var teamMappingDataId = getTeamMappingDataId(tournament, platformGameId, localTeamId);
                 var region = regionService.getTeamRegion(tournament, teamMappingDataId);
-                teams.put(localTeamId, this.createOrUpdateTeam(team, teamMappingDataId, region, players));
+                teams.put(localTeamId, this.createOrUpdateTeam(team, teamMappingDataId, region, players, tournament));
             }
 
             result.append("\nAgents:\n");
@@ -208,16 +211,23 @@ public class ValParser {
         }
     }
 
-    private Team createOrUpdateTeam(JsonNode team, String teamMappingDataId, String region, Map<Integer, Player> players) {
+    private Team createOrUpdateTeam(JsonNode team,
+                                    String teamMappingDataId,
+                                    String region,
+                                    Map<Integer, Player> players,
+                                    Tournament tournament) {
         var playersInTeam = new HashSet<PlayerRef>();
         for (JsonNode player: team.get("playersInTeam")) {
             var localPlayerId = player.get("value").asInt();
             playersInTeam.add(new PlayerRef(players.get(localPlayerId).id()));
         }
 
+        var teamData = teamDataRepository.getTeamDataByMappingDataId(tournament, teamMappingDataId);
+        var teamName = teamData != null ? teamData.name() : team.get("name").asText();
+
         var teamObj = new Team(
             null, 
-            team.get("name").asText(), 
+            teamName,
             teamMappingDataId,
             region,
             playersInTeam

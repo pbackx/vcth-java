@@ -8,14 +8,19 @@ import com.peated.valhack.model.Tournament;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LambdaHandler implements RequestHandler<Map<String, Object>, ActionGroupFunctionResponseEvent> {
     private final Connection conn;
+    private final HashMap<String, PreparedStatement> preparedStatementCache = new HashMap<>();
 
     public LambdaHandler() throws Exception {
         Class.forName("org.h2.Driver");
@@ -92,6 +97,9 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
             case "get_players":
                 responseText = getPlayers(getTournament(event), getRole(event));
                 break;
+            case "get_player_details":
+                responseText = getPlayerDetails(event);
+                break;
         }
 
         return new ActionGroupFunctionResponseEvent(
@@ -110,9 +118,81 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
         );
     }
 
-    public String getPlayers(Tournament tournament, Role role) {
-        String query = getQuery("players-for-role.sql");
+    public String getPlayerDetails(Map<String, Object> event) {
+        var playerId = getParameter(event, "player_id");
+        var playerName = getParameter(event, "player_name");
+        if (playerId == null && playerName == null) {
+            return "One of player_id or player_name is required";
+        }
 
+        var year = getYear(event);
+
+        if (playerId != null) {
+            return getPlayerDetailsById(Integer.parseInt(playerId), year);
+        } else {
+            return getPlayerDetailsByName(playerName, year);
+        }
+    }
+
+    private String getPlayerDetailsByName(String playerName, int year) {
+        var stmt = getQuery("player-details-by-search.sql");
+        try {
+            stmt.setString(1, playerName);
+            stmt.setInt(2, year);
+
+            return createPlayerDetailsResponse(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String createPlayerDetailsResponse(PreparedStatement stmt) {
+        StringBuilder playerDetails = new StringBuilder("| Player Id | Player Name | Player Handle | Player First Name | Player Last Name | Team Name | Team Region | Number of Wins |\n");
+        playerDetails.append("| --- | --- | --- | --- | --- | --- | --- | --- |\n");
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                playerDetails
+                        .append("| ")
+                        .append(rs.getString("id"))
+                        .append(" | ")
+                        .append(rs.getString("name"))
+                        .append(" | ")
+                        .append(rs.getString("handle"))
+                        .append(" | ")
+                        .append(rs.getString("first_name"))
+                        .append(" | ")
+                        .append(rs.getString("last_name"))
+                        .append(" | ")
+                        .append(rs.getString("team_name"))
+                        .append(" | ")
+                        .append(rs.getString("region"))
+                        .append(" | ")
+                        .append(rs.getString("wins"))
+                        .append(" |\n");
+            }
+            return playerDetails.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String getPlayerDetailsById(int playerId, int year) {
+        var stmt = getQuery("player-details-by-id.sql");
+        try {
+            stmt.setInt(1, playerId);
+            stmt.setInt(2, year);
+
+            return createPlayerDetailsResponse(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public String getPlayers(Tournament tournament, Role role) {
         if (role == null) {
             return "Role is missing or not found";
         }
@@ -123,8 +203,10 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
         System.out.println("Role: " + role.getId());
         System.out.println("Tournament: " + tournament.getId());
 
+        PreparedStatement stmt = getQuery("players-for-role.sql");
+
         List<String> players = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
             stmt.setInt(1, tournament.getId());
             stmt.setInt(2, role.getId());
 
@@ -152,9 +234,9 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
     }
 
     public String getTeamComposition(Tournament tournament, int year) {
-        String query = getQuery("team-composition.sql");
+        PreparedStatement stmt = getQuery("team-composition.sql");
         List<TeamComposition> teamCompositions = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
             stmt.setInt(1, tournament.getId());
             stmt.setInt(2, year);
 
@@ -184,11 +266,17 @@ public class LambdaHandler implements RequestHandler<Map<String, Object>, Action
 
     }
 
-    private String getQuery(String queryPath) {
+    private PreparedStatement getQuery(String queryPath) {
+        if (preparedStatementCache.containsKey(queryPath)) {
+            return preparedStatementCache.get(queryPath);
+        }
         try (var stream = this.getClass().getResourceAsStream("/db/queries/" + queryPath);
              var reader = new InputStreamReader(stream);
              var bufferedReader = new BufferedReader(reader)) {
-            return bufferedReader.lines().collect(Collectors.joining("\n"));
+            String query = bufferedReader.lines().collect(Collectors.joining("\n"));
+            PreparedStatement stmt = conn.prepareStatement(query);
+            preparedStatementCache.put(queryPath, stmt);
+            return stmt;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
